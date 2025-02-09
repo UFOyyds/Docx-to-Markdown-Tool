@@ -1,0 +1,63 @@
+<!-- HTML5 文档类型声明 -->
+<!DOCTYPE html>
+<!-- 定义HTML文档，设置语言为英文 -->
+<html lang="en">
+<!-- 网页头部信息区域 -->
+<head>
+    <!-- 定义网页字符编码为UTF-8，支持中文等多语言字符 -->
+    <meta charset="UTF-8">
+    <!-- 设置移动设备的视口，确保在移动设备上正确显示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 网页标题 -->
+    <title>Docx to Markdown Converter</title>
+</head>
+<!-- 网页主体内容区域 -->
+<body>
+    <!-- 页面主标题 -->
+    <h1>Docx to Markdown Converter</h1>
+    <!-- 文件上传表单，enctype属性指定表单数据包含文件 -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <!-- 文件选择输入框，限制只能选择.docx文件，必须选择文件才能提交 -->
+        <input type="file" name="file" id="fileInput" accept=".docx" required>
+        <!-- 提交按钮 -->
+        <button type="submit">Upload and Convert</button>
+    </form>
+
+    <!-- JavaScript 代码区域 -->
+    <script>
+        // 为上传表单添加提交事件处理函数
+        document.getElementById('uploadForm').onsubmit = function (event) {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 创建 FormData 对象，用于处理文件上传
+            var formData = new FormData();
+            // 获取文件输入框元素
+            var fileInput = document.getElementById('fileInput');
+            // 将选择的文件添加到 FormData 对象中
+            formData.append('file', fileInput.files[0]);
+
+            // 使用 fetch API 发送 POST 请求到服务器的 /convert 端点
+            fetch('/convert', {
+                method: 'POST',  // 设置请求方法为 POST
+                body: formData   // 设置请求体为包含文件的表单数据
+            })
+            // 将服务器响应转换为二进制大对象（Blob）
+            .then(response => response.blob())
+            // 处理转换后的文件下载
+            .then(blob => {
+                // 创建一个虚拟的链接元素
+                var link = document.createElement('a');
+                // 创建一个指向文件的 URL
+                link.href = URL.createObjectURL(blob);
+                // 设置下载文件的名称
+                link.download = 'converted.md';
+                // 模拟点击链接，触发文件下载
+                link.click();
+            })
+            // 捕获并显示可能发生的错误
+            .catch(error => alert('Error: ' + error));
+        };
+    </script>
+</body>
+</html>
